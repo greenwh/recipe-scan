@@ -11,6 +11,7 @@ Using your device's camera, it can scan a recipe card, intelligently extract the
 - **Manual Rotation Control:** Manually rotate images that don't have orientation data.
 - **AI-Powered Text Recognition:** Employs AI to parse the scanned text into a structured recipe format (Title, Ingredients, Instructions).
 - **Manual & Edit Modes:** Add recipes manually or edit any existing recipe at any time.
+- **Delete Recipes:** Easily remove recipes you no longer need.
 - **Local & Private:** All recipes are stored securely on your device in IndexedDB. Your data is never sent to a server.
 - **Shopping List Generator:** Select multiple recipes to create a consolidated, de-duplicated shopping list.
 - **Data Portability:** Export your entire recipe collection to a JSON file for backup, or import recipes from a file.

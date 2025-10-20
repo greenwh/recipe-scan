@@ -7,7 +7,7 @@ import RecipeEditor from './components/RecipeEditor';
 import Settings from './components/Settings';
 import RecipeDetail from './components/RecipeDetail';
 import ShoppingList from './components/ShoppingList';
-import { addRecipe, updateRecipe } from './db';
+import { addRecipe, updateRecipe, deleteRecipe } from './db';
 
 function App() {
   const [view, setView] = useState('list'); // 'list', 'scanner', 'editor', 'detail', 'settings', 'shoppingList'
@@ -48,6 +48,18 @@ function App() {
     setView('editor');
   };
 
+  const handleDeleteRecipe = async (id) => {
+    if (window.confirm('Are you sure you want to delete this recipe?')) {
+      try {
+        await deleteRecipe(id);
+        setRecipesUpdated(prev => !prev); // Trigger re-render
+      } catch (error) {
+        console.error("Failed to delete recipe:", error);
+        alert("Error: Could not delete the recipe.");
+      }
+    }
+  };
+
   const handleSaveRecipe = async (recipe) => {
     try {
       if (editingRecipeId) {
@@ -85,6 +97,7 @@ function App() {
             onRecipeSelect={handleRecipeSelect}
             onGenerateList={handleGenerateList}
             onManualAddClick={handleManualAddClick}
+            onDelete={handleDeleteRecipe}
             key={recipesUpdated} 
           />
         );

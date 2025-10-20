@@ -40,12 +40,13 @@ src/
 
 ## Key Component Logic
 
-- **`App.js`:** Acts as a simple router, managing the `view` state (`list`, `scanner`, `editor`, etc.) and passing data and handlers between child components.
+- **`App.js`:** Acts as a simple router, managing the `view` state (`list`, `scanner`, `editor`, etc.) and passing data and handlers (including `handleDeleteRecipe`) between child components.
+- **`RecipeList.js`:** Displays all recipes, handles selection for the shopping list, and includes a delete icon for removing recipes.
 - **`RecipeScanner.js`:**
-    1.  Uses `<input type="file">` to capture images.
-    2.  Uses `browser-image-compression` to correct orientation.
+    1.  Provides two distinct user actions: a "Choose Files" input for uploading existing images and a "Scan" button that directly opens the device camera.
+    2.  Uses `browser-image-compression` to correct orientation on all incoming images.
     3.  Provides a manual rotation fallback using an HTML canvas.
-    4.  Initializes a `Tesseract.worker` to perform OCR on the processed images.
+    4.  Initializes a `Tesseract.worker` to perform OCR on the processed images when the "Process Image(s)" button is clicked.
     5.  Passes the resulting raw text up to `App.js`.
 - **`RecipeEditor.js`:**
     1.  Receives either `rawText` (for scanning) or a `recipeId` (for editing).
@@ -53,7 +54,7 @@ src/
     3.  It includes robust logic to parse the JSON response from the AI.
     4.  If `recipeId` is present, it fetches the existing recipe from IndexedDB.
     5.  Provides a form for the user to review, edit, and save the recipe.
-- **`db.js`:** A crucial abstraction layer that simplifies all IndexedDB transactions (CRUD operations, bulk import) into async functions.
+- **`db.js`:** A crucial abstraction layer that simplifies all IndexedDB transactions (CRUD operations, including deletion, and bulk import) into async functions.
 
 ## Development Setup
 

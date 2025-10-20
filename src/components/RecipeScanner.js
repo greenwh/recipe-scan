@@ -108,18 +108,36 @@ function RecipeScanner({ onCancel, onScanComplete }) {
 
         <div className="mb-3">
           <label htmlFor="recipeImage" className="form-label">
-            Capture or Upload Recipe Image(s)
+            Upload Recipe Image(s)
           </label>
-          <input
-            type="file"
-            className="form-control"
-            id="recipeImage"
-            accept="image/*"
-            capture="environment"
-            onChange={handleImageChange}
-            multiple
-            disabled={isProcessing}
-          />
+          <div className="d-flex">
+            <input
+              type="file"
+              className="form-control"
+              id="recipeImage"
+              accept="image/*"
+              onChange={handleImageChange}
+              multiple
+              disabled={isProcessing}
+            />
+            <button 
+              className="btn btn-secondary ms-2" 
+              onClick={() => document.getElementById('cameraInput').click()}
+              disabled={isProcessing}
+            >
+              Scan
+            </button>
+            {/* Hidden input for camera */}
+            <input
+              type="file"
+              id="cameraInput"
+              accept="image/*"
+              capture="environment"
+              onChange={handleImageChange}
+              style={{ display: 'none' }}
+              multiple
+            />
+          </div>
         </div>
 
         {images.length > 0 && (
@@ -157,7 +175,7 @@ function RecipeScanner({ onCancel, onScanComplete }) {
 
         <div className="mt-3">
           <button className="btn btn-primary me-2" onClick={handleScan} disabled={images.length === 0 || isProcessing}>
-            {isProcessing ? 'Scanning...' : 'Start Scan'}
+            {isProcessing ? 'Processing...' : 'Process Image(s)'}
           </button>
           <button className="btn btn-secondary" onClick={onCancel} disabled={isProcessing}>
             Cancel

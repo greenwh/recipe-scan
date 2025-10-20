@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getAllRecipes } from '../db';
 
-function RecipeList({ onScanClick, onSettingsClick, onRecipeSelect, onGenerateList, onManualAddClick }) {
+function RecipeList({ onScanClick, onSettingsClick, onRecipeSelect, onGenerateList, onManualAddClick, onDelete }) {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectionMode, setSelectionMode] = useState(false);
@@ -71,7 +71,7 @@ function RecipeList({ onScanClick, onSettingsClick, onRecipeSelect, onGenerateLi
               <div className="flex-grow-1" onClick={() => !selectionMode && onRecipeSelect(recipe.id)} style={{ cursor: selectionMode ? 'default' : 'pointer' }}>
                 <h5 className="mb-1">{recipe.title}</h5>
               </div>
-              {selectionMode && (
+              {selectionMode ? (
                 <input
                   className="form-check-input"
                   type="checkbox"
@@ -79,6 +79,12 @@ function RecipeList({ onScanClick, onSettingsClick, onRecipeSelect, onGenerateLi
                   onChange={() => handleSelectToggle(recipe.id)}
                   style={{ transform: 'scale(1.5)' }}
                 />
+              ) : (
+                <button 
+                  className="btn-close" 
+                  aria-label="Delete"
+                  onClick={() => onDelete(recipe.id)}
+                ></button>
               )}
             </div>
           ))}
