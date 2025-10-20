@@ -1,70 +1,32 @@
-# Getting Started with Create React App
+# RecipeScan PWA
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+RecipeScan is a modern Progressive Web App (PWA) that transforms your physical recipe cards into a digital, searchable collection right on your phone.
 
-## Available Scripts
+Using your device's camera, it can scan a recipe card, intelligently extract the title, ingredients, and instructions using AI, and save it to a local, private database on your device.
 
-In the project directory, you can run:
+## Key Features
 
-### `npm start`
+- **Scan with Your Camera:** Digitize recipe cards using your phone's camera. The app supports multi-page scans for two-sided cards.
+- **Automatic Image Rotation:** Automatically corrects the orientation of photos for better accuracy.
+- **Manual Rotation Control:** Manually rotate images that don't have orientation data.
+- **AI-Powered Text Recognition:** Employs AI to parse the scanned text into a structured recipe format (Title, Ingredients, Instructions).
+- **Manual & Edit Modes:** Add recipes manually or edit any existing recipe at any time.
+- **Local & Private:** All recipes are stored securely on your device in IndexedDB. Your data is never sent to a server.
+- **Shopping List Generator:** Select multiple recipes to create a consolidated, de-duplicated shopping list.
+- **Data Portability:** Export your entire recipe collection to a JSON file for backup, or import recipes from a file.
+- **Offline Access:** As a PWA, your saved recipes are available even when you don't have an internet connection.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Getting Started
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+1.  **Go to Settings:** Navigate to the settings page using the button on the main screen.
+2.  **Enter API Key:** Provide your Google AI API Key. You can get a free key from [Google AI Studio](https://aistudio.google.com/app/apikey).
+3.  **Set Model Name:** It is recommended to use `gemini-1.5-pro` for the best results.
+4.  **Start Scanning:** Use the "Scan New Recipe" button to start digitizing your cards, or "Add Manually" to type one in.
 
-### `npm test`
+## Development
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+To run this project locally:
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+1.  Clone the repository.
+2.  Install dependencies: `npm install`
+3.  Start the development server: `npm start`

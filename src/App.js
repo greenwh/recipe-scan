@@ -1,25 +1,108 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import RecipeList from './components/RecipeList';
+import RecipeScanner from './components/RecipeScanner';
+import RecipeEditor from './components/RecipeEditor';
+import Settings from './components/Settings';
+import RecipeDetail from './components/RecipeDetail';
+import ShoppingList from './components/ShoppingList';
+import { addRecipe, updateRecipe } from './db';
 
 function App() {
+  const [view, setView] = useState('list'); // 'list', 'scanner', 'editor', 'detail', 'settings', 'shoppingList'
+  const [rawText, setRawText] = useState('');
+  const [selectedRecipeId, setSelectedRecipeId] = useState(null);
+  const [editingRecipeId, setEditingRecipeId] = useState(null);
+  const [selectedRecipeIds, setSelectedRecipeIds] = useState([]);
+  const [recipesUpdated, setRecipesUpdated] = useState(false);
+
+  const handleScanClick = () => setView('scanner');
+  const handleSettingsClick = () => setView('settings');
+  const handleCancel = () => setView('list');
+
+  const handleManualAddClick = () => {
+    setRawText(''); // Ensure no old text is carried over
+    setView('editor');
+  };
+
+  const handleRecipeSelect = (id) => {
+    setSelectedRecipeId(id);
+    setView('detail');
+  };
+
+  const handleEdit = (id) => {
+    setEditingRecipeId(id);
+    setRawText(''); // Not scanning, so clear raw text
+    setView('editor');
+  };
+
+  const handleGenerateList = (ids) => {
+    setSelectedRecipeIds(ids);
+    setView('shoppingList');
+  };
+
+  const handleScanComplete = (text) => {
+    setRawText(text);
+    setEditingRecipeId(null);
+    setView('editor');
+  };
+
+  const handleSaveRecipe = async (recipe) => {
+    try {
+      if (editingRecipeId) {
+        await updateRecipe({ ...recipe, id: editingRecipeId });
+      } else {
+        await addRecipe(recipe);
+      }
+      setRecipesUpdated(prev => !prev);
+      setEditingRecipeId(null);
+      setView('list');
+    } catch (error) {
+      console.error("Failed to save recipe:", error);
+      alert("Error: Could not save the recipe. A recipe with this title may already exist.");
+    }
+  };
+  
+  const renderView = () => {
+    switch (view) {
+      case 'scanner':
+        return <RecipeScanner onCancel={handleCancel} onScanComplete={handleScanComplete} />;
+      case 'editor':
+        return <RecipeEditor rawText={rawText} recipeId={editingRecipeId} onSave={handleSaveRecipe} onCancel={handleCancel} />;
+      case 'settings':
+        return <Settings onBack={handleCancel} />;
+      case 'detail':
+        return <RecipeDetail recipeId={selectedRecipeId} onBack={handleCancel} onEdit={handleEdit} />;
+      case 'shoppingList':
+        return <ShoppingList recipeIds={selectedRecipeIds} onBack={handleCancel} />;
+      case 'list':
+      default:
+        return (
+          <RecipeList 
+            onScanClick={handleScanClick} 
+            onSettingsClick={handleSettingsClick} 
+            onRecipeSelect={handleRecipeSelect}
+            onGenerateList={handleGenerateList}
+            onManualAddClick={handleManualAddClick}
+            key={recipesUpdated} 
+          />
+        );
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+    <div className="container mt-4">
+      <header className="text-center mb-4">
+        <h1>RecipeScan</h1>
+        <p className="lead">Your Digital Recipe Box</p>
       </header>
+      <main>
+        {renderView()}
+      </main>
     </div>
   );
 }
 
 export default App;
+
