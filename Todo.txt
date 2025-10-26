@@ -1,5 +1,2 @@
-add file upload to mobile (browse add files (pics)).  right now the choose file area opens the camera so there's no way to upload/add existing images. not sure how this will work on computers where choose files actually works for lidibg files.  maybe make it a file picker for both platforms, then add a "Scan Recipe" button to actually take a pic that populates the box 
-
-the "Start Scan" should be relabled to "Process Image(s)" 
-
-add the ability to delete recipes
+add search
+add sharing recipe by standard sharing (text, app, etc)
