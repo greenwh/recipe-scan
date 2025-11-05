@@ -1,1 +1,45 @@
+/* Print styles */
+@media print {
+  /* Hide all buttons when printing */
+  button,
+  .btn,
+  .btn-close {
+    display: none !important;
+  }
 
+  /* Hide alerts when printing */
+  .alert {
+    display: none !important;
+  }
+
+  /* Hide the header when printing */
+  header {
+    display: none !important;
+  }
+
+  /* Ensure the card takes full width */
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Optimize text for printing */
+  body {
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  /* Prevent page breaks inside ingredients and instructions */
+  .list-group-item {
+    page-break-inside: avoid;
+  }
+
+  h3, h5 {
+    page-break-after: avoid;
+  }
+
+  /* Add some spacing for readability */
+  .mt-4 {
+    margin-top: 1.5rem !important;
+  }
+}
