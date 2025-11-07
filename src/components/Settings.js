@@ -1,25 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { getAllRecipes, bulkImportRecipes } from '../db';
+import { AI_PROVIDERS, DEFAULT_MODELS } from '../aiProviders';
 
 function Settings({ onBack }) {
   const [apiKey, setApiKey] = useState('');
-  const [modelName, setModelName] = useState('gemini-1.5-pro');
+  const [modelName, setModelName] = useState('');
+  const [aiProvider, setAiProvider] = useState('google');
 
   useEffect(() => {
-    const storedKey = localStorage.getItem('geminiApiKey');
-    if (storedKey) {
-      setApiKey(storedKey);
-    }
-    const storedModel = localStorage.getItem('geminiModelName');
-    if (storedModel) {
-      setModelName(storedModel);
-    }
+    // Load stored values
+    const storedKey = localStorage.getItem('aiApiKey') || localStorage.getItem('geminiApiKey') || '';
+    const storedProvider = localStorage.getItem('aiProvider') || 'google';
+    const storedModel = localStorage.getItem('aiModelName') || localStorage.getItem('geminiModelName') || '';
+
+    setApiKey(storedKey);
+    setAiProvider(storedProvider);
+    setModelName(storedModel || DEFAULT_MODELS[storedProvider]);
   }, []);
 
   const handleSaveSettings = () => {
+    localStorage.setItem('aiApiKey', apiKey);
+    localStorage.setItem('aiProvider', aiProvider);
+    localStorage.setItem('aiModelName', modelName);
+    // Keep old keys for backwards compatibility
     localStorage.setItem('geminiApiKey', apiKey);
     localStorage.setItem('geminiModelName', modelName);
     alert('Settings saved!');
+  };
+
+  const handleProviderChange = (e) => {
+    const newProvider = e.target.value;
+    setAiProvider(newProvider);
+    // Auto-fill default model for the selected provider
+    setModelName(DEFAULT_MODELS[newProvider]);
   };
 
   const handleExport = async () => {
@@ -82,17 +95,39 @@ function Settings({ onBack }) {
         <div className="mb-4">
           <h6>AI Configuration</h6>
           <p><small>Your API key is stored securely in your browser's local storage and is never shared.</small></p>
+
           <div className="mb-3">
-            <label htmlFor="apiKey" className="form-label">Google AI API Key</label>
+            <label htmlFor="aiProvider" className="form-label">AI Provider</label>
+            <select
+              id="aiProvider"
+              className="form-select"
+              value={aiProvider}
+              onChange={handleProviderChange}
+            >
+              {Object.entries(AI_PROVIDERS).map(([key, name]) => (
+                <option key={key} value={key}>{name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="mb-3">
+            <label htmlFor="apiKey" className="form-label">API Key</label>
             <input
               id="apiKey"
               type="password"
               className="form-control"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Enter your Google AI API Key"
+              placeholder={`Enter your ${AI_PROVIDERS[aiProvider]} API Key`}
             />
+            <small className="form-text text-muted">
+              {aiProvider === 'google' && 'Get your API key from: https://aistudio.google.com/app/apikey'}
+              {aiProvider === 'openai' && 'Get your API key from: https://platform.openai.com/api-keys'}
+              {aiProvider === 'claude' && 'Get your API key from: https://console.anthropic.com/'}
+              {aiProvider === 'grok' && 'Get your API key from: https://console.x.ai/'}
+            </small>
           </div>
+
           <div className="mb-3">
             <label htmlFor="modelName" className="form-label">Model Name</label>
             <input
@@ -101,8 +136,13 @@ function Settings({ onBack }) {
               className="form-control"
               value={modelName}
               onChange={(e) => setModelName(e.target.value)}
+              placeholder={`e.g., ${DEFAULT_MODELS[aiProvider]}`}
             />
+            <small className="form-text text-muted">
+              Leave default or specify a different model version
+            </small>
           </div>
+
           <button className="btn btn-primary" onClick={handleSaveSettings}>Save Settings</button>
         </div>
 

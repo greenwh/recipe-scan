@@ -1,11 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getRecipeById } from '../db';
+import { processRecipeWithAI, AI_PROVIDERS } from '../aiProviders';
 
 function RecipeEditor({ rawText, recipeId, onSave, onCancel }) {
   const [recipe, setRecipe] = useState({ title: '', ingredients: [], instructions: '' });
   const [apiKey, setApiKey] = useState('');
+  const [aiProvider, setAiProvider] = useState('google');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const processTextWithAI = useCallback(async (text, key, provider) => {
+    if (!key) {
+      setError(`Please enter your ${AI_PROVIDERS[provider || 'google']} API Key to process the recipe.`);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    const modelName = localStorage.getItem('aiModelName') || localStorage.getItem('geminiModelName') || '';
+    const selectedProvider = provider;
+
+    try {
+      const parsedRecipe = await processRecipeWithAI(text, selectedProvider, key, modelName);
+      setRecipe(parsedRecipe);
+    } catch (err) {
+      console.error("AI processing failed:", err);
+      setError(`Failed to process the recipe with AI. ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     async function loadRecipeForEdit() {
@@ -24,10 +50,13 @@ function RecipeEditor({ rawText, recipeId, onSave, onCancel }) {
           setIsLoading(false);
         }
       } else if (rawText) {
-        const storedApiKey = localStorage.getItem('geminiApiKey');
+        // Load AI settings (check both new and old keys for backwards compatibility)
+        const storedApiKey = localStorage.getItem('aiApiKey') || localStorage.getItem('geminiApiKey');
+        const storedProvider = localStorage.getItem('aiProvider') || 'google';
         if (storedApiKey) {
           setApiKey(storedApiKey);
-          processTextWithAI(rawText, storedApiKey);
+          setAiProvider(storedProvider);
+          processTextWithAI(rawText, storedApiKey, storedProvider);
         } else {
           setIsLoading(false);
         }
@@ -36,72 +65,14 @@ function RecipeEditor({ rawText, recipeId, onSave, onCancel }) {
       }
     }
     loadRecipeForEdit();
-  }, [rawText, recipeId]);
-
-  const processTextWithAI = async (text, key) => {
-    if (!key) {
-      setError('Please enter your Google AI API Key to process the recipe.');
-      setIsLoading(false);
-      return;
-    }
-    
-    setIsLoading(true);
-    setError('');
-
-    const modelName = localStorage.getItem('geminiModelName') || 'gemini-1.5-pro';
-    const prompt = `
-      You are a recipe parsing expert. Your ONLY output must be a single, valid JSON object. Do not include any other text, markdown, or explanations.
-      Analyze the following raw text extracted from a recipe card and format it into this JSON object.
-      The JSON object must have three keys: "title" (string), "ingredients" (an array of strings), and "instructions" (a single string with newlines preserved).
-      If you cannot determine the content for a field, return an empty string or empty array for that field. If the entire text is unreadable, return a JSON object with empty values for all fields.
-
-      Raw Text:
-      """
-      ${text}
-      """
-    `;
-
-    try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${key}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`API request failed with status ${response.status}: ${errorData.error.message}`);
-      }
-
-      const data = await response.json();
-      const rawResponse = data.candidates[0].content.parts[0].text;
-      
-      const jsonMatch = rawResponse.match(/```json\n([\s\S]*?)\n```/);
-      const jsonString = jsonMatch ? jsonMatch[1] : rawResponse;
-      
-      let parsedRecipe;
-      try {
-        parsedRecipe = JSON.parse(jsonString);
-      } catch (parseError) {
-        throw new Error("AI returned a non-JSON response. The recipe card may be unclear.");
-      }
-      
-      if (typeof parsedRecipe.ingredients === 'string') {
-        parsedRecipe.ingredients = parsedRecipe.ingredients.split('\n').filter(ing => ing.trim() !== '');
-      }
-
-      setRecipe(parsedRecipe);
-    } catch (err) {
-      console.error("AI processing failed:", err);
-      setError(`Failed to process the recipe with AI. ${err.message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [rawText, recipeId, processTextWithAI]);
 
   const handleSaveApiKey = () => {
+    localStorage.setItem('aiApiKey', apiKey);
+    localStorage.setItem('aiProvider', aiProvider);
+    // Keep old keys for backwards compatibility
     localStorage.setItem('geminiApiKey', apiKey);
-    processTextWithAI(rawText, apiKey);
+    processTextWithAI(rawText, apiKey, aiProvider);
   };
 
   const handleInputChange = (e) => {
@@ -127,18 +98,23 @@ function RecipeEditor({ rawText, recipeId, onSave, onCancel }) {
       <div className="card">
         <div className="card-body">
           <h5 className="card-title">API Key Required</h5>
-          <p>Please enter your Google AI API Key to structure the recipe.</p>
+          <p>Please enter your {AI_PROVIDERS[aiProvider]} API Key to structure the recipe.</p>
           <div className="mb-3">
             <input
               type="password"
               className="form-control"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Enter your Google AI API Key"
+              placeholder={`Enter your ${AI_PROVIDERS[aiProvider]} API Key`}
             />
           </div>
           <button className="btn btn-primary" onClick={handleSaveApiKey}>Save Key & Process</button>
           <button className="btn btn-secondary ms-2" onClick={onCancel}>Cancel</button>
+          <div className="mt-3">
+            <small className="text-muted">
+              You can configure the AI provider in Settings. Current: {AI_PROVIDERS[aiProvider]}
+            </small>
+          </div>
         </div>
       </div>
     );
