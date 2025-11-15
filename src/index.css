@@ -11,3 +11,11 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Mobile input fixes */
+input,
+textarea,
+select {
+  font-size: 16px !important; /* Prevents iOS zoom on focus */
+  touch-action: manipulation; /* Prevents double-tap zoom delay */
+}
